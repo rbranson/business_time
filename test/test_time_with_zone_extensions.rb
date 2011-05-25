@@ -31,6 +31,27 @@ class TestTimeWithZoneExtensions < Test::Unit::TestCase
       assert(!Time.workday?(Time.zone.parse("July 5th, 2010 2:37 pm")))
     end
   
+    context "with make_up_for_weekend_holidays set" do
+
+      setup do
+        BusinessTime::Config.reset
+        BusinessTime::Config.make_up_for_weekend_holidays = true
+      end
+
+      should "know the friday before a saturday holiday is not a workday" do
+        friday_afternoon_before_christmas = Time.zone.parse("December 24th, 2010 1:15 pm")
+        assert Time.workday?(friday_afternoon_before_christmas)
+        BusinessTime::Config.holidays << Date.parse("December 25th, 2010") # a saturday
+        assert !Time.workday?(friday_afternoon_before_christmas)
+      end
+
+      should "know the monday after a sunday holiday is not a workday" do
+        monday_afternoon_after_christmas = Time.zone.parse("December 26th, 2011 1:15 pm")
+        assert Time.workday?(monday_afternoon_after_christmas)
+        BusinessTime::Config.holidays << Date.parse("December 25th, 2011") # a sunday
+        assert !Time.workday?(monday_afternoon_after_christmas)
+      end
+    end
   
     should "know the beginning of the day for an instance" do
       first = Time.zone.parse("August 17th, 2010, 11:50 am")

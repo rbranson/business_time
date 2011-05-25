@@ -30,4 +30,26 @@ class TestDateExtensions < Test::Unit::TestCase
     assert(!july_5.workday?)
   end
   
+  context "with make_up_for_weekend_holidays set" do
+    
+    setup do
+      BusinessTime::Config.reset
+      BusinessTime::Config.make_up_for_weekend_holidays = true
+    end
+    
+    should "know the friday before a saturday holiday is not a workday" do
+      friday_before_christmas = Date.parse("December 24th, 2010")
+      assert friday_before_christmas.workday?
+      BusinessTime::Config.holidays << Date.parse("December 25th, 2010") # a saturday
+      assert !friday_before_christmas.workday?
+    end
+    
+    should "know the monday after a sunday holiday is not a workday" do
+      monday_after_christmas = Date.parse("December 26th, 2011")
+      assert monday_after_christmas.workday?
+      BusinessTime::Config.holidays << Date.parse("December 25th, 2011") # a sunday
+      assert !monday_after_christmas.workday?
+    end
+  end
+  
 end

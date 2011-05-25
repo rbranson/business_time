@@ -22,6 +22,11 @@ module BusinessTime
       #   BusinessTime::Config.holidays << my_holiday_date_object
       # someplace in the initializers of your application.
       attr_accessor :holidays
+      
+      # A true or false value, tells BusinessTime to "make up" for holidays
+      # that land on a Saturday or Sunday. Saturday holidays are shifted to
+      # Friday, and Sunday holidays are shifted to Monday.
+      attr_accessor :make_up_for_weekend_holidays
 
     end
     
@@ -29,6 +34,7 @@ module BusinessTime
       self.holidays = []
       self.beginning_of_workday = "9:00 am"
       self.end_of_workday = "5:00 pm"
+      self.make_up_for_weekend_holidays = false
     end
     
     # loads the config data from a yaml file written as:
@@ -49,7 +55,7 @@ module BusinessTime
         self.holidays <<
           Time.zone ? Time.zone.parse(holiday) : Time.parse(holiday)
       end
-      
+      self.make_up_for_weekend_holidays = data["business_time"]["make_up_for_weekend_holidays"]
     end
     
     #reset the first time we are loaded.

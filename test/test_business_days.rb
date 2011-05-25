@@ -64,6 +64,35 @@ class TestBusinessDays < Test::Unit::TestCase
       expected = Time.parse("July 5th, 2010, 4:50 pm")
       assert_equal expected, monday_afternoon
     end
+
+    context "with make_up_for_weekend_holidays set" do
+      
+      setup do
+        BusinessTime::Config.reset
+        BusinessTime::Config.make_up_for_weekend_holidays = true
+      end
+      
+      should "make-up for a saturday weekend holiday by moving it to friday" do
+        christmas       = Date.parse("December 25th, 2010") # on a saturday
+        day_before_eve  = Date.parse("December 23rd, 2010")
+        next_biz_day    = Time.parse("December 27th, 2010") # skip friday because it's now a holiday
+      
+        BusinessTime::Config.holidays << christmas
+      
+        assert_equal next_biz_day, 1.business_day.after(day_before_eve)
+      end
+    
+      should "make-up for a sunday weekend holiday by moving it to monday" do
+        christmas       = Date.parse("December 25th, 2011") # on a sunday
+        friday_before   = Date.parse("December 23rd, 2011")
+        next_biz_day    = Time.parse("December 27th, 2011") # skip monday because it's now a holiday
+      
+        BusinessTime::Config.holidays << christmas
+      
+        assert_equal next_biz_day, 1.business_day.after(friday_before)
+      end
+    end
+    
   end
   
 end

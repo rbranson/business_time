@@ -19,7 +19,7 @@ class TestBusinessHours < Test::Unit::TestCase
     end
 
     should "take into account a weekend when adding an hour" do
-      friday_afternoon = Time.parse("April 9th, 4:50 pm")
+      friday_afternoon = Time.parse("April 9th 2010, 4:50 pm")
       monday_morning = 1.business_hour.after(friday_afternoon)
       expected = Time.parse("April 12th 2010, 9:50 am")
       assert_equal expected, monday_morning
@@ -30,14 +30,6 @@ class TestBusinessHours < Test::Unit::TestCase
       friday_afternoon = 1.business_hour.before(monday_morning)
       expected = Time.parse("April 9th 2010, 4:50 pm")
       assert_equal expected, friday_afternoon
-    end
-
-    should "take into account a holiday" do
-      BusinessTime::Config.holidays << Date.parse("July 5th, 2010")
-      friday_afternoon = Time.parse("July 2nd 2010, 4:50pm")
-      tuesday_morning = 1.business_hour.after(friday_afternoon)
-      expected = Time.parse("July 6th 2010, 9:50 am")
-      assert_equal expected, tuesday_morning
     end
 
     should "add hours in the middle of the workday"  do
@@ -63,6 +55,14 @@ class TestBusinessHours < Test::Unit::TestCase
       sunday = Time.parse("Sun Apr 25 12:06:56, 2010")
       monday = Time.parse("Mon Apr 26, 09:00:00, 2010")
       assert_equal 1.business_hour.before(monday), 1.business_hour.before(sunday)
+    end
+    
+    should "take into account a holiday" do
+      BusinessTime::Config.holidays << Date.parse("July 5th, 2010")
+      friday_afternoon = Time.parse("July 2nd 2010, 4:50pm")
+      tuesday_morning = 1.business_hour.after(friday_afternoon)
+      expected = Time.parse("July 6th 2010, 9:50 am")
+      assert_equal expected, tuesday_morning
     end
   end
 

@@ -22,4 +22,11 @@ class TestConfig < Test::Unit::TestCase
     assert BusinessTime::Config.holidays.include?(daves_birthday)
   end
   
+  should "keep track of weekend holiday makeup" do
+    BusinessTime::Config.reset
+    assert BusinessTime::Config.make_up_for_weekend_holidays == false
+    BusinessTime::Config.make_up_for_weekend_holidays = true
+    assert BusinessTime::Config.make_up_for_weekend_holidays == true
+  end
+  
 end
